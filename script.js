@@ -3,19 +3,10 @@
  * Core Logic (Vanilla JavaScript)
  * 
  * Organized into modules for maintainability.
+ * 
+ * NOTE: Firebase has been removed. Authentication is now handled by React components
+ * using Google OAuth (@react-oauth/google). See src/auth.ts for details.
  */
-
-import { 
-    auth, 
-    db, 
-    googleProvider, 
-    signInWithPopup, 
-    signOut, 
-    onAuthStateChanged, 
-    doc, 
-    setDoc, 
-    serverTimestamp 
-} from './src/firebase.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // --- GLOBAL STATE ---
@@ -668,86 +659,20 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // === AUTH ENGINE ===
+    // DEPRECATED: Firebase authentication has been removed.
+    // Authentication is now handled by React components using Google OAuth.
+    // See src/components/AuthUI.tsx and src/components/AuthModal.tsx
     const AuthEngine = {
         init() {
-            const btnLogin = document.getElementById('btn-login');
-            const btnLogout = document.getElementById('btn-logout');
-            const userProfile = document.getElementById('user-profile');
-            const userAvatar = document.getElementById('user-avatar');
-            const userName = document.getElementById('user-name');
-
-            if (btnLogin) {
-                btnLogin.onclick = async () => {
-                    try {
-                        await signInWithPopup(auth, googleProvider);
-                    } catch (error) {
-                        console.error('Login failed:', error);
-                        showToast('Login failed', 'danger');
-                    }
-                };
-            }
-
-            if (btnLogout) {
-                btnLogout.onclick = async () => {
-                    try {
-                        await signOut(auth);
-                    } catch (error) {
-                        console.error('Logout failed:', error);
-                    }
-                };
-            }
-
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    state.user = user;
-                    if (btnLogin) btnLogin.classList.add('d-none');
-                    if (userProfile) userProfile.classList.remove('d-none');
-                    if (userAvatar) userAvatar.src = user.photoURL || '';
-                    if (userName) userName.innerText = user.displayName || 'User';
-                    
-                    showToast(`Welcome, ${user.displayName}!`, 'success');
-                    
-                    // Sync user to Firestore
-                    await this.syncUser(user);
-                } else {
-                    state.user = null;
-                    if (btnLogin) btnLogin.classList.remove('d-none');
-                    if (userProfile) userProfile.classList.add('d-none');
-                    if (userAvatar) userAvatar.src = '';
-                    if (userName) userName.innerText = '';
-                }
-            });
+            console.log('AuthEngine deprecated - using React Google OAuth components instead');
         },
 
         async syncUser(user) {
-            const userRef = doc(db, 'users', user.uid);
-            try {
-                await setDoc(userRef, {
-                    uid: user.uid,
-                    email: user.email,
-                    displayName: user.displayName,
-                    photoURL: user.photoURL,
-                    lastLogin: serverTimestamp(),
-                    updatedAt: serverTimestamp()
-                }, { merge: true });
-            } catch (error) {
-                this.handleFirestoreError(error, 'write', `users/${user.uid}`);
-            }
+            console.log('User sync deprecated - using React auth system');
         },
 
         handleFirestoreError(error, operationType, path) {
-            const errInfo = {
-                error: error instanceof Error ? error.message : String(error),
-                authInfo: {
-                    userId: auth.currentUser?.uid,
-                    email: auth.currentUser?.email,
-                    emailVerified: auth.currentUser?.emailVerified,
-                },
-                operationType,
-                path
-            };
-            console.error('Firestore Error: ', JSON.stringify(errInfo));
-            throw new Error(JSON.stringify(errInfo));
+            console.error('Firestore Error (deprecated):', error);
         }
     };
 
@@ -761,7 +686,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- INITIALIZE ALL ---
-    AuthEngine.init();
+    // AuthEngine.init(); // DEPRECATED: Using React Google OAuth components instead
     initHeaderMenus();
     EditorCore.init();
     FileOperations.init();
