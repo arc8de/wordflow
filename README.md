@@ -68,4 +68,4 @@ WordFlow is a production-quality, responsive web application designed for writer
 - **F11**: Fullscreen Mode
 
 ## 📄 License
-This project is open-source and created for educational purposes.
+This project is open-source and created for educational purposes (B.Tech Web Technology).

@@ -175,6 +175,18 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
+/* User Profile Styles */
+#user-profile img {
+    object-fit: cover;
+    transition: transform 0.2s;
+}
+#user-profile img:hover {
+    transform: scale(1.1);
+}
+#btn-logout:hover {
+    color: #ef4444 !important; /* red-500 */
+}
+
 /* Header & Nav */
 .navbar {
     min-height: 56px;

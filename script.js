@@ -5,6 +5,18 @@
  * Organized into modules for maintainability.
  */
 
+import { 
+    auth, 
+    db, 
+    googleProvider, 
+    signInWithPopup, 
+    signOut, 
+    onAuthStateChanged, 
+    doc, 
+    setDoc, 
+    serverTimestamp 
+} from './src/firebase.js';
+
 document.addEventListener('DOMContentLoaded', () => {
     // --- GLOBAL STATE ---
     const state = {
@@ -12,7 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
         lastKeystrokeTime: null,
         wordCount: 0,
         isAutosaving: false,
-        theme: localStorage.getItem('theme') || 'light'
+        theme: localStorage.getItem('theme') || 'light',
+        user: null
     };
 
     // --- DOM ELEMENTS ---
@@ -654,6 +667,90 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // === AUTH ENGINE ===
+    const AuthEngine = {
+        init() {
+            const btnLogin = document.getElementById('btn-login');
+            const btnLogout = document.getElementById('btn-logout');
+            const userProfile = document.getElementById('user-profile');
+            const userAvatar = document.getElementById('user-avatar');
+            const userName = document.getElementById('user-name');
+
+            if (btnLogin) {
+                btnLogin.onclick = async () => {
+                    try {
+                        await signInWithPopup(auth, googleProvider);
+                    } catch (error) {
+                        console.error('Login failed:', error);
+                        showToast('Login failed', 'danger');
+                    }
+                };
+            }
+
+            if (btnLogout) {
+                btnLogout.onclick = async () => {
+                    try {
+                        await signOut(auth);
+                    } catch (error) {
+                        console.error('Logout failed:', error);
+                    }
+                };
+            }
+
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    state.user = user;
+                    if (btnLogin) btnLogin.classList.add('d-none');
+                    if (userProfile) userProfile.classList.remove('d-none');
+                    if (userAvatar) userAvatar.src = user.photoURL || '';
+                    if (userName) userName.innerText = user.displayName || 'User';
+                    
+                    showToast(`Welcome, ${user.displayName}!`, 'success');
+                    
+                    // Sync user to Firestore
+                    await this.syncUser(user);
+                } else {
+                    state.user = null;
+                    if (btnLogin) btnLogin.classList.remove('d-none');
+                    if (userProfile) userProfile.classList.add('d-none');
+                    if (userAvatar) userAvatar.src = '';
+                    if (userName) userName.innerText = '';
+                }
+            });
+        },
+
+        async syncUser(user) {
+            const userRef = doc(db, 'users', user.uid);
+            try {
+                await setDoc(userRef, {
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: user.displayName,
+                    photoURL: user.photoURL,
+                    lastLogin: serverTimestamp(),
+                    updatedAt: serverTimestamp()
+                }, { merge: true });
+            } catch (error) {
+                this.handleFirestoreError(error, 'write', `users/${user.uid}`);
+            }
+        },
+
+        handleFirestoreError(error, operationType, path) {
+            const errInfo = {
+                error: error instanceof Error ? error.message : String(error),
+                authInfo: {
+                    userId: auth.currentUser?.uid,
+                    email: auth.currentUser?.email,
+                    emailVerified: auth.currentUser?.emailVerified,
+                },
+                operationType,
+                path
+            };
+            console.error('Firestore Error: ', JSON.stringify(errInfo));
+            throw new Error(JSON.stringify(errInfo));
+        }
+    };
+
     // --- HEADER MENU LOGIC ---
     const initHeaderMenus = () => {
         const menuSpell = document.getElementById('menu-spellcheck');
@@ -664,6 +761,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- INITIALIZE ALL ---
+    AuthEngine.init();
     initHeaderMenus();
     EditorCore.init();
     FileOperations.init();
