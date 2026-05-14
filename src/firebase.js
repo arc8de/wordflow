@@ -1,11 +1,6 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
-import { getFirestore, doc, setDoc, serverTimestamp } from 'firebase/firestore';
-import firebaseConfig from '../firebase-applet-config.json';
+// This file is deprecated. Firebase has been removed from the project.
+// Google OAuth is now used for authentication instead.
+// See src/auth.ts for authentication configuration.
 
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
-export const googleProvider = new GoogleAuthProvider();
+export {};
 
-export { signInWithPopup, signOut, onAuthStateChanged, doc, setDoc, serverTimestamp };
