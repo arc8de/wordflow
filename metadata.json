@@ -1,0 +1,8 @@
+{
+  "name": "WordFlow",
+  "description": "A smart, responsive word processor and writing assistant with live analytics, autosave, and search features.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

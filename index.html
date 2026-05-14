@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WordFlow — Smart Word Processor</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Georgia&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-light">
+
+    <!-- Header & Toolbar Fixed Section -->
+    <div class="sticky-top shadow-sm" style="z-index: 1020;">
+        <!-- Header -->
+        <header class="navbar navbar-expand-lg px-3 py-2 bg-white border-bottom">
+            <div class="container-fluid">
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary text-white fw-bold rounded-1 d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px;">W</div>
+                    <div>
+                        <h1 class="navbar-brand mb-0 h6 fw-bold text-dark fs-6">WordFlow — <span class="fw-normal text-muted" id="doc-title">Untitled Document</span></h1>
+                        <div class="d-flex gap-1 text-muted" style="font-size: 0.7rem;">
+                            <!-- File Menu -->
+                            <div class="dropdown">
+                                <span class="hover-link dropdown-toggle no-caret" data-bs-toggle="dropdown">File</span>
+                                <ul class="dropdown-menu shadow border-0">
+                                    <li><a class="dropdown-item" href="#" onclick="document.getElementById('btn-new').click()"><i class="fas fa-file me-2 text-muted"></i> New</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="document.getElementById('btn-open').click()"><i class="fas fa-folder-open me-2 text-muted"></i> Open</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="#" onclick="document.getElementById('btn-save-txt').click()"><i class="fas fa-save me-2 text-muted"></i> Save as TXT</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="document.getElementById('btn-print').click()"><i class="fas fa-print me-2 text-muted"></i> Print</a></li>
+                                </ul>
+                            </div>
+                            <!-- Edit Menu -->
+                            <div class="dropdown">
+                                <span class="hover-link dropdown-toggle no-caret" data-bs-toggle="dropdown">Edit</span>
+                                <ul class="dropdown-menu shadow border-0">
+                                    <li><a class="dropdown-item" href="#" onclick="document.getElementById('btn-undo').click()"><i class="fas fa-undo me-2 text-muted"></i> Undo</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="document.getElementById('btn-redo').click()"><i class="fas fa-redo me-2 text-muted"></i> Redo</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="#" onclick="document.getElementById('editor').focus(); document.execCommand('selectAll', false, null)"><i class="fas fa-mouse-pointer me-2 text-muted"></i> Select All</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="document.getElementById('toggle-search').click()"><i class="fas fa-search me-2 text-muted"></i> Find & Replace</a></li>
+                                </ul>
+                            </div>
+                            <!-- Format Menu -->
+                            <div class="dropdown">
+                                <span class="hover-link dropdown-toggle no-caret" data-bs-toggle="dropdown">Format</span>
+                                <ul class="dropdown-menu shadow border-0">
+                                    <li><a class="dropdown-item" href="#" onclick="document.execCommand('bold', false, null)"><i class="fas fa-bold me-2 text-muted"></i> Bold</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="document.execCommand('italic', false, null)"><i class="fas fa-italic me-2 text-muted"></i> Italic</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="document.execCommand('underline', false, null)"><i class="fas fa-underline me-2 text-muted"></i> Underline</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="#" onclick="document.execCommand('removeFormat', false, null)"><i class="fas fa-eraser me-2 text-muted"></i> Clear Formatting</a></li>
+                                </ul>
+                            </div>
+                            <!-- Tools Menu -->
+                            <div class="dropdown">
+                                <span class="hover-link dropdown-toggle no-caret" data-bs-toggle="dropdown">Tools</span>
+                                <ul class="dropdown-menu shadow border-0">
+                                    <li><a class="dropdown-item" href="#" onclick="SuggestionsEngine.check(); showToast('Writing analysis complete', 'info')"><i class="fas fa-spell-check me-2 text-muted"></i> Writing Assistant</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="StatsEngine.calculate(editor.innerText); showToast('Stats recalculated', 'info')"><i class="fas fa-chart-line me-2 text-muted"></i> Force Recalculate Stats</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="#" onclick="document.getElementById('btn-date').click()"><i class="fas fa-calendar-alt me-2 text-muted"></i> Insert Timestamp</a></li>
+                                </ul>
+                            </div>
+                            <!-- Help Menu -->
+                            <div class="dropdown">
+                                <span class="hover-link dropdown-toggle no-caret" data-bs-toggle="dropdown">Help</span>
+                                <ul class="dropdown-menu shadow border-0">
+                                    <li><a class="dropdown-item" href="#" onclick="showToast('WordFlow v1.0 — Smart Writing Assistant', 'info')"><i class="fas fa-info-circle me-2 text-muted"></i> About WordFlow</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="showToast('Tip: Use Ctrl+S to save manually', 'primary')"><i class="fas fa-lightbulb me-2 text-muted"></i> Keyboard Shortcuts</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="ms-auto d-flex align-items-center gap-3">
+                    <div id="save-status" class="bg-light border px-2 py-1 rounded d-flex align-items-center gap-1 d-none d-sm-flex" style="font-size: 0.65rem;">
+                        <span class="text-muted">Saved to LocalStorage</span>
+                        <div class="bg-success rounded-circle" style="width: 6px; height: 6px;"></div>
+                    </div>
+                    <div class="vr h-50 my-auto d-none d-sm-block"></div>
+                    <button id="toggle-dark-mode" class="btn btn-link text-muted p-1" title="Toggle Dark Mode">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <button id="toggle-fullscreen" class="btn btn-link text-muted p-1" title="Fullscreen (F11)">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                    <button class="btn btn-primary btn-sm px-3 fw-bold">Share</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Toolbar -->
+        <div class="toolbar-container bg-white px-3 py-1 border-bottom">
+            <div class="container-fluid d-flex align-items-center gap-1 overflow-auto scrollbar-hide py-1">
+                
+                <!-- File Group -->
+                <div class="btn-group me-2">
+                    <button class="btn btn-light btn-sm" id="btn-new" title="New"><i class="fas fa-plus"></i></button>
+                    <button class="btn btn-light btn-sm" id="btn-open" title="Open"><i class="fas fa-folder-open"></i></button>
+                    <div class="btn-group">
+                        <button class="btn btn-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown"><i class="fas fa-save"></i></button>
+                        <ul class="dropdown-menu shadow border-0">
+                            <li><a class="dropdown-item py-2" href="#" id="btn-save-txt">Save as .txt</a></li>
+                            <li><a class="dropdown-item py-2" href="#" id="btn-save-html">Save as .html</a></li>
+                        </ul>
+                    </div>
+                    <button class="btn btn-light btn-sm" id="btn-print" title="Print"><i class="fas fa-print"></i></button>
+                </div>
+
+                <div class="vr mx-1"></div>
+
+                <!-- History Group -->
+                <div class="btn-group me-2">
+                    <button class="btn btn-light btn-sm" id="btn-undo" title="Undo"><i class="fas fa-undo"></i></button>
+                    <button class="btn btn-light btn-sm" id="btn-redo" title="Redo"><i class="fas fa-redo"></i></button>
+                </div>
+
+            <div class="vr mx-1"></div>
+
+            <!-- Formatting Group -->
+            <div class="btn-group me-2">
+                <button class="btn btn-light btn-sm toolbar-btn" data-command="bold" title="Bold (Ctrl+B)"><i class="fas fa-bold"></i></button>
+                <button class="btn btn-light btn-sm toolbar-btn" data-command="italic" title="Italic (Ctrl+I)"><i class="fas fa-italic"></i></button>
+                <button class="btn btn-light btn-sm toolbar-btn" data-command="underline" title="Underline (Ctrl+U)"><i class="fas fa-underline"></i></button>
+                <button class="btn btn-light btn-sm toolbar-btn" data-command="removeFormat" title="Clear Formatting"><i class="fas fa-eraser"></i></button>
+            </div>
+
+            <!-- Color Group -->
+            <div class="d-flex align-items-center gap-1 me-2">
+                <label for="foreColor" class="small text-muted d-none d-md-block">Color</label>
+                <input type="color" class="form-control form-control-color border-0 p-0" id="foreColor" value="#000000" title="Text Color" style="width: 24px; height: 24px;">
+                <label for="hiliteColor" class="small text-muted d-none d-md-block">Highlight</label>
+                <input type="color" class="form-control form-control-color border-0 p-0" id="hiliteColor" value="#ffffff" title="Highlight Color" style="width: 24px; height: 24px;">
+            </div>
+
+            <div class="vr mx-1"></div>
+
+            <!-- Dropdowns Group -->
+            <div class="d-flex align-items-center gap-1 me-2">
+                <select id="fontName" class="form-select form-select-sm border-0" style="width: 120px;">
+                    <option value="Arial">Arial</option>
+                    <option value="Georgia" selected>Georgia</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Verdana">Verdana</option>
+                    <option value="Courier New">Courier New</option>
+                    <option value="Inter">Inter</option>
+                </select>
+                <select id="fontSize" class="form-select form-select-sm border-0" style="width: 80px;">
+                    <option value="12px">12px</option>
+                    <option value="14px">14px</option>
+                    <option value="16px" selected>16px</option>
+                    <option value="18px">18px</option>
+                    <option value="24px">24px</option>
+                    <option value="32px">32px</option>
+                    <option value="48px">48px</option>
+                </select>
+            </div>
+
+            <div class="vr mx-1"></div>
+
+            <!-- Alignment Group -->
+            <div class="btn-group me-2">
+                <button class="btn btn-light btn-sm toolbar-btn" data-command="justifyLeft" title="Align Left"><i class="fas fa-align-left"></i></button>
+                <button class="btn btn-light btn-sm toolbar-btn" data-command="justifyCenter" title="Align Center"><i class="fas fa-align-center"></i></button>
+                <button class="btn btn-light btn-sm toolbar-btn" data-command="justifyRight" title="Align Right"><i class="fas fa-align-right"></i></button>
+                <button class="btn btn-light btn-sm toolbar-btn" data-command="justifyFull" title="Justify"><i class="fas fa-align-justify"></i></button>
+            </div>
+
+            <!-- Lists Group -->
+            <div class="btn-group me-2">
+                <button class="btn btn-light btn-sm toolbar-btn" data-command="insertOrderedList" title="Numbered List"><i class="fas fa-list-ol"></i></button>
+                <button class="btn btn-light btn-sm toolbar-btn" data-command="insertUnorderedList" title="Bulleted List"><i class="fas fa-list-ul"></i></button>
+            </div>
+
+            <div class="vr mx-1"></div>
+
+            <!-- Utilities -->
+            <button class="btn btn-light btn-sm" id="btn-date" title="Insert Date & Time"><i class="far fa-clock"></i></button>
+            <button class="btn btn-light btn-sm" id="btn-copy" title="Copy to Clipboard"><i class="fas fa-copy"></i></button>
+            <button class="btn btn-light btn-sm" id="toggle-search" title="Search & Replace (Ctrl+F)"><i class="fas fa-search"></i></button>
+
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <main class="container-fluid pt-2 pb-5 px-lg-3">
+        <div class="row g-3">
+            
+            <!-- Left Sidebar (Collapsible Search/Replace) -->
+            <div id="search-sidebar" class="col-lg-3 d-none">
+                <div class="card border-0 shadow-sm sticky-sidebar">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0 fw-bold">Search & Replace</h6>
+                        <button class="btn-close small" id="close-search"></button>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label small fw-medium">Find</label>
+                            <input type="text" id="find-input" class="form-control form-control-sm" placeholder="Search text...">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-medium">Replace with</label>
+                            <input type="text" id="replace-input" class="form-control form-control-sm" placeholder="New text...">
+                        </div>
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <button id="find-prev" class="btn btn-outline-primary btn-sm flex-grow-1">Prev</button>
+                            <button id="find-next" class="btn btn-outline-primary btn-sm flex-grow-1">Next</button>
+                        </div>
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <button id="replace-one" class="btn btn-primary btn-sm flex-grow-1">Replace</button>
+                            <button id="replace-all" class="btn btn-primary btn-sm flex-grow-1">All</button>
+                        </div>
+                        <div id="search-count" class="text-muted small">Matches: 0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Editor Section -->
+            <div id="editor-column" class="col">
+                <div class="editor-outer d-flex justify-content-center">
+                    <div id="editor" contenteditable="true" class="editor-paper shadow">
+                        <h1>Welcome to WordFlow</h1>
+                        <p>Start typing here to begin. This editor supports <b>rich text formatting</b>, live word counting, autosave, and writing suggestions.</p>
+                        <p>Try selecting text and applying formatting from the toolbar. Use <b>Ctrl+S</b> to save your work locally.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Sidebar (Stats & Suggestions) -->
+            <div class="col-lg-3">
+                <div class="sticky-sidebar d-flex flex-column gap-4">
+                    
+                    <!-- Stats Card -->
+                    <div class="card border-0 shadow-sm overflow-hidden mb-4">
+                        <div class="card-header bg-white border-bottom py-3">
+                            <h6 class="mb-0 fw-bold text-muted small uppercase tracking-wider">Live Analytics</h6>
+                        </div>
+                        <div class="card-body p-3">
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <div class="stat-card-blue text-center">
+                                        <p class="text-[10px] text-primary font-bold uppercase mb-1" style="font-size: 0.65rem;">Words</p>
+                                        <p id="stat-words" class="h4 mb-0 fw-bold">0</p>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="stat-card-gray text-center">
+                                        <p class="text-[10px] text-muted font-bold uppercase mb-1" style="font-size: 0.65rem;">Chars</p>
+                                        <p id="stat-chars" class="h4 mb-0 fw-bold">0</p>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="stat-card-gray text-center">
+                                        <p class="text-[10px] text-muted font-bold uppercase mb-1" style="font-size: 0.65rem;">Read Time</p>
+                                        <p id="stat-reading" class="h5 mb-0 fw-bold">0m</p>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="stat-card-gray text-center">
+                                        <p class="text-[10px] text-muted font-bold uppercase mb-1" style="font-size: 0.65rem;">Speed</p>
+                                        <div class="d-flex align-items-baseline justify-content-center">
+                                            <p id="stat-wpm" class="h5 mb-0 fw-bold">0</p>
+                                            <span class="ms-1 text-muted" style="font-size: 0.6rem;">wpm</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Suggestions Card -->
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white border-bottom">
+                            <h6 class="mb-0 fw-bold">Suggestions</h6>
+                        </div>
+                        <div id="suggestions-list" class="card-body p-0 max-vh-50 overflow-auto">
+                            <div class="text-center p-4 text-muted small">
+                                <i class="fas fa-sparkles text-warning mb-2"></i>
+                                <p class="mb-0">All clear! No issues found.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Word Frequency Chart -->
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white border-bottom">
+                            <h6 class="mb-0 fw-bold">Word Frequency</h6>
+                        </div>
+                        <div class="card-body">
+                            <div id="frequency-bars" class="d-flex flex-column gap-2">
+                                <!-- Bars will be injected here -->
+                                <div class="text-center py-2 text-muted small">Start typing to see stats</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Status Bar -->
+    <div class="bg-white border-top py-1 px-3 fixed-bottom d-flex justify-content-between align-items-center shadow-lg" style="z-index: 1030;">
+        <div class="small text-muted d-flex gap-3">
+            <span>Words: <b id="bar-words">0</b></span>
+            <span class="d-none d-sm-inline">Lines: <b id="bar-lines">0</b></span>
+        </div>
+        <div class="small">
+            <span id="autosave-msg" class="text-muted"><i class="fas fa-sync-alt fa-spin me-1 d-none" id="autosave-spinner"></i> Autosave ON</span>
+        </div>
+        <div class="small d-none d-sm-block">
+            <span class="badge bg-light text-dark border"><i class="fas fa-keyboard me-1"></i> Edit Mode</span>
+        </div>
+    </div>
+
+    <!-- Hidden File Input for Open -->
+    <input type="file" id="file-input" class="d-none" accept=".txt">
+
+    <!-- Toast Notifications -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="bottom: 40px !important;">
+        <div id="app-toast" class="toast align-items-center border-0 shadow" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="toast-message"></div>
+                <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Banner for Restore Draft -->
+    <div id="restore-banner" class="alert alert-info border-0 shadow-lg fixed-top m-3 d-none animate-slide-down" style="top: 110px; z-index: 2000;">
+        <div class="d-flex justify-content-between align-items-center">
+            <span><i class="fas fa-history me-2"></i> We found a previously unsaved draft.</span>
+            <div class="d-flex gap-2">
+                <button id="btn-restore" class="btn btn-primary btn-sm">Restore</button>
+                <button id="btn-discard" class="btn btn-outline-secondary btn-sm">Discard</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Main Script -->
+    <script src="script.js"></script>
+</body>
+</html>
