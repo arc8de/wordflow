@@ -3,43 +3,41 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState } from 'react';
-import AuthUI from './components/AuthUI';
-import AuthModal from './components/AuthModal';
+import Header from './Header';
 
-export default function App() {
-  const [showAuthModal, setShowAuthModal] = useState(true);
+interface User {
+  id: string;
+  username: string;
+  email: string;
+  name: string;
+}
 
+interface AppProps {
+  currentUser: User | null;
+  onLogout: () => void;
+}
+
+export default function App({ currentUser, onLogout }: AppProps) {
   return (
-    <div className="min-vh-100">
-      {/* Header with Auth */}
-      <header className="navbar navbar-expand-lg px-3 py-2 bg-white border-bottom shadow-sm">
-        <div className="container-fluid">
-          <div className="d-flex align-items-center justify-content-between w-100">
-            <div className="d-flex align-items-center">
-              <div
-                className="bg-primary text-white fw-bold rounded-1 d-flex align-items-center justify-content-center me-3"
-                style={{ width: '32px', height: '32px' }}
-              >
-                W
-              </div>
-              <h1 className="mb-0 h6 fw-bold text-dark">WordFlow</h1>
-            </div>
-            <AuthUI />
-          </div>
-        </div>
-      </header>
+    <div>
+      <Header currentUser={currentUser} onLogout={onLogout} />
 
       {/* Main Content */}
-      <div className="container py-5">
-        <div className="text-center">
-          <h2>Welcome to WordFlow</h2>
-          <p className="text-muted">Your personal writing companion</p>
+      <div className="container-fluid mt-4">
+        <div className="row">
+          <div className="col-md-12">
+            <div className="alert alert-info" role="alert">
+              <strong>Welcome!</strong> You are logged in as <code>{currentUser?.username}</code>. This is your WordFlow workspace.
+            </div>
+            <div className="card">
+              <div className="card-body">
+                <h5 className="card-title">Main Editor</h5>
+                <p className="card-text text-muted">The document editor will be displayed here.</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-
-      {/* Auth Modal */}
-      <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
     </div>
   );
 }

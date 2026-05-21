@@ -1,73 +1,60 @@
-// Google OAuth configuration
-export const googleOAuthConfig = {
-  clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID || '',
-  authUri: 'https://accounts.google.com/o/oauth2/auth',
-  tokenUri: 'https://oauth2.googleapis.com/token',
-  redirectUri: window.location.origin,
-  scope: 'openid profile email',
-};
+/**
+ * Dummy authentication system
+ */
 
-export interface GoogleUser {
+export interface User {
   id: string;
+  username: string;
+  password: string;
   email: string;
   name: string;
-  picture?: string;
-  iat?: number;
-  exp?: number;
 }
 
-// Store auth state in localStorage
-const AUTH_STORAGE_KEY = 'wordflow_auth';
-
-export const authStorage = {
-  setUser: (user: GoogleUser | null) => {
-    if (user) {
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
-    } else {
-      localStorage.removeItem(AUTH_STORAGE_KEY);
-    }
+// Dummy users database
+export const DUMMY_USERS: User[] = [
+  {
+    id: '1',
+    username: 'john_doe',
+    password: 'password123',
+    email: 'john@example.com',
+    name: 'John Doe'
   },
-
-  getUser: (): GoogleUser | null => {
-    const stored = localStorage.getItem(AUTH_STORAGE_KEY);
-    return stored ? JSON.parse(stored) : null;
+  {
+    id: '2',
+    username: 'jane_smith',
+    password: 'secure456',
+    email: 'jane@example.com',
+    name: 'Jane Smith'
   },
+  {
+    id: '3',
+    username: 'bob_wilson',
+    password: 'pass789',
+    email: 'bob@example.com',
+    name: 'Bob Wilson'
+  }
+];
 
-  setToken: (token: string) => {
-    localStorage.setItem(`${AUTH_STORAGE_KEY}_token`, token);
-  },
-
-  getToken: (): string | null => {
-    return localStorage.getItem(`${AUTH_STORAGE_KEY}_token`);
-  },
-
-  clear: () => {
-    localStorage.removeItem(AUTH_STORAGE_KEY);
-    localStorage.removeItem(`${AUTH_STORAGE_KEY}_token`);
-  },
+export const validateLogin = (username: string, password: string): User | null => {
+  const user = DUMMY_USERS.find(
+    u => u.username === username && u.password === password
+  );
+  return user || null;
 };
 
-// Decode JWT token
-export const decodeJwt = (token: string): any => {
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
-    );
-    return JSON.parse(jsonPayload);
-  } catch (error) {
-    console.error('Failed to decode JWT:', error);
-    return null;
+export const getCurrentUser = (): User | null => {
+  const userStr = localStorage.getItem('currentUser');
+  return userStr ? JSON.parse(userStr) : null;
+};
+
+export const setCurrentUser = (user: User | null): void => {
+  if (user) {
+    localStorage.setItem('currentUser', JSON.stringify(user));
+  } else {
+    localStorage.removeItem('currentUser');
   }
 };
 
-// Check if token is expired
-export const isTokenExpired = (token: string): boolean => {
-  const decoded = decodeJwt(token);
-  if (!decoded || !decoded.exp) return true;
-  return decoded.exp * 1000 < Date.now();
+export const logout = (): void => {
+  localStorage.removeItem('currentUser');
 };

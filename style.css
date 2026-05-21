@@ -175,18 +175,6 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-/* User Profile Styles */
-#user-profile img {
-    object-fit: cover;
-    transition: transform 0.2s;
-}
-#user-profile img:hover {
-    transform: scale(1.1);
-}
-#btn-logout:hover {
-    color: #ef4444 !important; /* red-500 */
-}
-
 /* Header & Nav */
 .navbar {
     min-height: 56px;
@@ -309,6 +297,30 @@ body {
 .fixed-bottom {
     height: 28px;
     background-color: var(--color-surface);
+
+/* Header Styles */
+.navbar {
+    z-index: 1000;
+}
+
+.navbar-brand {
+    white-space: nowrap;
+}
+
+.navbar .btn-outline-danger:hover {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+.navbar .btn-primary:hover {
+    box-shadow: 0 4px 12px rgba(74, 108, 247, 0.3);
+}
+
+[data-theme="dark"] .navbar {
+    background-color: var(--color-surface) !important;
+    border-bottom-color: var(--color-border) !important;
+}
     border-top: 1px solid var(--color-border) !important;
     font-size: 11px;
 }

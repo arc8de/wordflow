@@ -3,9 +3,6 @@
  * Core Logic (Vanilla JavaScript)
  * 
  * Organized into modules for maintainability.
- * 
- * NOTE: Firebase has been removed. Authentication is now handled by React components
- * using Google OAuth (@react-oauth/google). See src/auth.ts for details.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -15,8 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
         lastKeystrokeTime: null,
         wordCount: 0,
         isAutosaving: false,
-        theme: localStorage.getItem('theme') || 'light',
-        user: null
+        theme: localStorage.getItem('theme') || 'light'
     };
 
     // --- DOM ELEMENTS ---
@@ -658,24 +654,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // === AUTH ENGINE ===
-    // DEPRECATED: Firebase authentication has been removed.
-    // Authentication is now handled by React components using Google OAuth.
-    // See src/components/AuthUI.tsx and src/components/AuthModal.tsx
-    const AuthEngine = {
-        init() {
-            console.log('AuthEngine deprecated - using React Google OAuth components instead');
-        },
-
-        async syncUser(user) {
-            console.log('User sync deprecated - using React auth system');
-        },
-
-        handleFirestoreError(error, operationType, path) {
-            console.error('Firestore Error (deprecated):', error);
-        }
-    };
-
     // --- HEADER MENU LOGIC ---
     const initHeaderMenus = () => {
         const menuSpell = document.getElementById('menu-spellcheck');
@@ -686,7 +664,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- INITIALIZE ALL ---
-    // AuthEngine.init(); // DEPRECATED: Using React Google OAuth components instead
     initHeaderMenus();
     EditorCore.init();
     FileOperations.init();
