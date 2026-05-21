@@ -75,6 +75,29 @@ export default function Editor() {
     alert('Document saved!');
   };
 
+  const handleSaveAsText = () => {
+    const text = editorRef.current?.innerText || '';
+    const element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    element.setAttribute('download', 'document.txt');
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  };
+
+  const handleCopyToClipboard = () => {
+    const text = editorRef.current?.innerText || '';
+    navigator.clipboard.writeText(text).then(() => {
+      alert('Copied to clipboard!');
+    });
+  };
+
+  const handleInsertDate = () => {
+    const now = new Date().toLocaleString();
+    document.execCommand('insertHTML', false, now);
+  };
+
   const maxFreqValue = Math.max(...Object.values(wordFreq), 1);
 
   return (
@@ -82,6 +105,105 @@ export default function Editor() {
       {/* Toolbar */}
       <div className="toolbar-container bg-white px-3 py-1 border-bottom sticky-top" style={{ zIndex: 999 }}>
         <div className="container-fluid d-flex align-items-center gap-1 overflow-auto py-1">
+          
+          {/* Dropdown Menus */}
+          <div className="d-flex gap-2 me-3">
+            {/* File Menu */}
+            <div className="dropdown">
+              <button className="btn btn-link text-dark p-0" style={{ fontSize: '0.9rem', fontWeight: 500 }} type="button" data-bs-toggle="dropdown">
+                File
+              </button>
+              <ul className="dropdown-menu shadow border-0">
+                <li><a className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); }}>
+                  <i className="fas fa-file me-2 text-muted"></i> New
+                </a></li>
+                <li><a className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); }}>
+                  <i className="fas fa-folder-open me-2 text-muted"></i> Open
+                </a></li>
+                <li><hr className="dropdown-divider" /></li>
+                <li><a className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); handleSaveAsText(); }}>
+                  <i className="fas fa-save me-2 text-muted"></i> Save as TXT
+                </a></li>
+                <li><a className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); window.print(); }}>
+                  <i className="fas fa-print me-2 text-muted"></i> Print
+                </a></li>
+              </ul>
+            </div>
+
+            {/* Edit Menu */}
+            <div className="dropdown">
+              <button className="btn btn-link text-dark p-0" style={{ fontSize: '0.9rem', fontWeight: 500 }} type="button" data-bs-toggle="dropdown">
+                Edit
+              </button>
+              <ul className="dropdown-menu shadow border-0">
+                <li><a className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); document.execCommand('undo'); }}>
+                  <i className="fas fa-undo me-2 text-muted"></i> Undo
+                </a></li>
+                <li><a className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); document.execCommand('redo'); }}>
+                  <i className="fas fa-redo me-2 text-muted"></i> Redo
+                </a></li>
+                <li><hr className="dropdown-divider" /></li>
+                <li><a className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); document.execCommand('selectAll'); }}>
+                  <i className="fas fa-mouse-pointer me-2 text-muted"></i> Select All
+                </a></li>
+              </ul>
+            </div>
+
+            {/* Format Menu */}
+            <div className="dropdown">
+              <button className="btn btn-link text-dark p-0" style={{ fontSize: '0.9rem', fontWeight: 500 }} type="button" data-bs-toggle="dropdown">
+                Format
+              </button>
+              <ul className="dropdown-menu shadow border-0">
+                <li><a className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); handleFormatCommand('bold'); }}>
+                  <i className="fas fa-bold me-2 text-muted"></i> Bold
+                </a></li>
+                <li><a className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); handleFormatCommand('italic'); }}>
+                  <i className="fas fa-italic me-2 text-muted"></i> Italic
+                </a></li>
+                <li><a className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); handleFormatCommand('underline'); }}>
+                  <i className="fas fa-underline me-2 text-muted"></i> Underline
+                </a></li>
+                <li><hr className="dropdown-divider" /></li>
+                <li><a className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); handleFormatCommand('removeFormat'); }}>
+                  <i className="fas fa-eraser me-2 text-muted"></i> Clear Formatting
+                </a></li>
+              </ul>
+            </div>
+
+            {/* Tools Menu */}
+            <div className="dropdown">
+              <button className="btn btn-link text-dark p-0" style={{ fontSize: '0.9rem', fontWeight: 500 }} type="button" data-bs-toggle="dropdown">
+                Tools
+              </button>
+              <ul className="dropdown-menu shadow border-0">
+                <li><a className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); alert('Writing analysis complete'); }}>
+                  <i className="fas fa-spell-check me-2 text-muted"></i> Writing Assistant
+                </a></li>
+                <li><hr className="dropdown-divider" /></li>
+                <li><a className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); handleInsertDate(); }}>
+                  <i className="fas fa-calendar-alt me-2 text-muted"></i> Insert Timestamp
+                </a></li>
+              </ul>
+            </div>
+
+            {/* Help Menu */}
+            <div className="dropdown">
+              <button className="btn btn-link text-dark p-0" style={{ fontSize: '0.9rem', fontWeight: 500 }} type="button" data-bs-toggle="dropdown">
+                Help
+              </button>
+              <ul className="dropdown-menu shadow border-0">
+                <li><a className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); alert('WordFlow v1.0 — Smart Writing Assistant'); }}>
+                  <i className="fas fa-info-circle me-2 text-muted"></i> About WordFlow
+                </a></li>
+                <li><a className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); alert('Tip: Use formatting buttons or keyboard shortcuts to format your text'); }}>
+                  <i className="fas fa-lightbulb me-2 text-muted"></i> Keyboard Shortcuts
+                </a></li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="vr mx-1"></div>
           
           {/* File Group */}
           <div className="btn-group me-2">
@@ -168,6 +290,24 @@ export default function Editor() {
               <i className="fas fa-list-ul"></i>
             </button>
           </div>
+
+          <div className="vr mx-1"></div>
+
+          {/* Utilities */}
+          <button 
+            className="btn btn-light btn-sm" 
+            title="Insert Date & Time"
+            onClick={handleInsertDate}
+          >
+            <i className="far fa-clock"></i>
+          </button>
+          <button 
+            className="btn btn-light btn-sm" 
+            title="Copy to Clipboard"
+            onClick={handleCopyToClipboard}
+          >
+            <i className="fas fa-copy"></i>
+          </button>
         </div>
       </div>
 
